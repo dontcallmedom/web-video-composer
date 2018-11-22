@@ -16,17 +16,23 @@ function runningTitle(filename, cv) {
   cv.currentTime = 0;
   cv.videoWidth = cv.width;
   cv.videoHeight = cv.height;
-
-  const loaded = new Promise((res, rej) => {
+  const sound = new Audio('key.mp3');
+  
+  const loaded = Promise.all([
     fetch(filename).then(r => r.text())
       .then(loadedtext => {
         text = loadedtext;
         cv.duration = (text.split("\n").length * lineDelay + text.split("\n").reduce((total, l) => total + [...l].filter(removeSpecialChar).length * charDelay, 0) + endDelay) / 1000;
-        res();
-      });
-  });
+      }),
+    new Promise((res) => sound.onloadeddata = res)
+  ]
+  );
 
   function drawLineUpTo(line, i, withCaret, y) {
+    if (withCaret) {
+      const s = sound.cloneNode(true);
+      s.play();
+    }
     const rawchars = [...line];
     const chars = rawchars.filter(removeSpecialChar);
     ctx.fillText(chars.slice(0, i + 1).join('') +  (withCaret ? '_' : ''), 50, y);
@@ -70,7 +76,7 @@ function runningTitle(filename, cv) {
         ctx.clearRect(0, 0, cv.width, cv.height);
       }, 1000);
     const y = 200 + j*150;
-    const linelength = [...lines[j]].length;
+    const linelength = [...lines[j]].filter(removeSpecialChar).length;
     if (i >= linelength) {
       return setTimeout(() => {
         clearRect(50, 200 + j*150 - fontSize, cv.width - 50, fontSize*1.5);
