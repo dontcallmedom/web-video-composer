@@ -96,9 +96,11 @@ fetch("script").then(r => r.text())
         const now = performance.now() - start;
         timeline.filter(t => t.start <= now && t.end >= now)
           .forEach(t => t.commands.forEach(command => {
-            const {verb, target} = command;
+            const {verb, target, options} = command;
             const type = target.slice(0, 1);
             const targetEl = assets[target].el;
+            const dur = t.end - t.start;
+            ctx.globalAlpha = 1;
             if (!command.done) {
               if (verb === 'pause') {
                 targetEl.pause();
@@ -106,7 +108,13 @@ fetch("script").then(r => r.text())
                 if (type !== 'i')
                   targetEl.play();
               }
+            }
+            if (!options.includes("fadein") && !options.includes("fadeout"))
               command.done = true;
+            if (options.includes("fadein")) {
+              ctx.globalAlpha = 1 - (t.end - now)/dur;
+            } else if (options.includes("fadeout")) {
+              ctx.globalAlpha = (t.end - now)/dur;
             }
             if (type === 'v' || type === 't' || type === 'i' || type === 'f') {
               ctx.drawImage(targetEl, 0, 0, canvas.width, canvas.height);
