@@ -43,7 +43,7 @@ const loadAsset = (type, path) => {
 
 fetch("script").then(r => r.text())
   .then(script => {
-    const [assetDefs, timelineDefs] = script.split("\n\n\n");
+    const [assetDefs, ...timelineDefs] = script.split("\n\n");
     const allLoaded = [];
     const assets = assetDefs.split('\n').reduce((acc, def) => {
       const [id, filename] = def.split(':');
@@ -76,7 +76,7 @@ fetch("script").then(r => r.text())
     Promise.all(allLoaded).then(() => {
       let prevTime = 0;
       const timeline = [];
-      timelineDefs.split('\n\n').forEach(block => {
+      timelineDefs.forEach(block => {
         const [timing, ...commandLines] = block.split('\n');
         const [start, end] = timing.split('->').map(b => convertTimeboundaryDef(b, prevTime));
         prevTime = end;
