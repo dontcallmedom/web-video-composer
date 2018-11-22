@@ -28,7 +28,14 @@ const loadAsset = (type, path) => {
     el.width = canvas.width;
     el.height = canvas.height;
     loaded = runningTitle(path, el);
+  } else if (type === 'f') {
+    el = document.createElement('canvas');
+    el.width = canvas.width;
+    el.height = canvas.height;
+    const [dir, dur] = path.split('-');
+    loaded = fader(dur, dir, el);
   }
+
   return {el, loaded};
 };
 
@@ -99,7 +106,7 @@ fetch("script").then(r => r.text())
               }
               command.done = true;
             }
-            if (type === 'v' || type === 't' || type === 'i') {
+            if (type === 'v' || type === 't' || type === 'i' || type === 'f') {
               ctx.drawImage(targetEl, 0, 0, canvas.width, canvas.height);
             } else {
 
