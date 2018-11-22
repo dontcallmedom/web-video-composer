@@ -55,19 +55,21 @@ fetch("script").then(r => r.text())
     let assetTimelines = Object.keys(assets).reduce((acc, x) => { acc[x] = 0; return acc;}, {});
     const convertTimeboundaryDef = (boundary, offset = 0) => {
       let comp;
-      if (comp = boundary.match(/(\+?)([0-9]{2}):([0-9]{2}):([0-9]{2}),([0-9]{3})/)) {
+      if (comp = boundary.match(/([\-\+]?)([0-9]{2}):([0-9]{2}):([0-9]{2}),([0-9]{3})/)) {
         const [, sign, hours, minutes, seconds, ms] = comp.map((c,i) => i > 1 ? parseInt(c, 10) : c);
-        return (sign === '+' ? offset : 0) + hours * 3600* 1000 + minutes * 60 * 1000 + seconds * 1000 + ms;
-      } else if (comp = boundary.match(/([\+>]?)([aitv][0-9]+)/)) {
+        return Math.abs((sign === '+' ? offset : (sign === '-' ? -offset : 0)) + hours * 3600* 1000 + minutes * 60 * 1000 + seconds * 1000 + ms);
+      } else if (comp = boundary.match(/([\-\+>]?)([afitv][0-9]+)/)) {
         const [, sign, id] = comp;
         if (sign === '+') {
           // nothing to do, offset is already set
+        } else if (sign === '-') {
+          offset = -offset;
         } else if (sign === '>') {
           offset -= assetTimelines[id];
         } else {
           offset = 0;
         }
-        return offset + assets[id].el.duration * 1000;
+        return Math.abs(offset + assets[id].el.duration * 1000);
       }
     };
 
