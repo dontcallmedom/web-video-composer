@@ -2,6 +2,25 @@ const canvas = document.getElementById('composer');
 const ctx = canvas.getContext('2d');
 const startBtn = document.getElementById('start');
 
+const videoStream = canvas.captureStream();
+const stream = new MediaStream([...videoStream.getVideoTracks()]);
+
+const recorder = new MediaRecorder(stream, {mimeType: 'video/webm'});
+
+const chunks = [];
+recorder.ondataavailable = (e) => {
+  chunks.push(e.data);
+};
+recorder.onstop = () => {
+  const blob = new Blob(chunks, {'type': 'video/webm'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('download', 'video.webm');
+  link.href = url;
+  link.textContent = "video";
+  document.querySelector('body').appendChild(link);
+};
+
 
 const loadAsset = (type, path) => {
   let el, loaded;
@@ -13,7 +32,6 @@ const loadAsset = (type, path) => {
     }[type];
     el.src = path;
     if (type === 'v' || type === 'i') {
-      // TODO: set width & height
       el.width = canvas.width;
       el.style.width = canvas.width;
       el.style.objectFit = 'contain';
@@ -35,7 +53,6 @@ const loadAsset = (type, path) => {
     const [dir, dur] = path.split('-');
     loaded = fader(dur, dir, el);
   }
-
   return {el, loaded};
 };
 
@@ -55,10 +72,10 @@ fetch("script").then(r => r.text())
     let assetTimelines = Object.keys(assets).reduce((acc, x) => { acc[x] = 0; return acc;}, {});
     const convertTimeboundaryDef = (boundary, offset = 0) => {
       let comp;
-      if (comp = boundary.match(/([\-\+]?)([0-9]{2}):([0-9]{2}):([0-9]{2}),([0-9]{3})/)) {
+      if ((comp = boundary.match(/([\-\+]?)([0-9]{2}):([0-9]{2}):([0-9]{2}),([0-9]{3})/))) {
         const [, sign, hours, minutes, seconds, ms] = comp.map((c,i) => i > 1 ? parseInt(c, 10) : c);
         return Math.abs((sign === '+' ? offset : (sign === '-' ? -offset : 0)) + hours * 3600* 1000 + minutes * 60 * 1000 + seconds * 1000 + ms);
-      } else if (comp = boundary.match(/([\-\+>]?)([afitv][0-9]+)/)) {
+      } else if ((comp = boundary.match(/([\-\+>]?)([afitv][0-9]+)/))) {
         const [, sign, id] = comp;
         if (sign === '+') {
           // nothing to do, offset is already set
@@ -81,7 +98,7 @@ fetch("script").then(r => r.text())
         const [start, end] = timing.split('->').map(b => convertTimeboundaryDef(b, prevTime));
         prevTime = end;
 
-        const commands = commandLines.filter(x => x).map(c => { [verb, target, ...options] = c.split(' '); return {verb, target, options, done: false};})
+        const commands = commandLines.filter(x => x).map(c => { const [verb, target, ...options] = c.split(' '); return {verb, target, options, done: false};});
         commands.forEach(({verb, target}) => {
           if (verb === 'play') {
             assetTimelines[target] += end - start;
@@ -118,18 +135,19 @@ fetch("script").then(r => r.text())
             }
             if (type === 'v' || type === 't' || type === 'i' || type === 'f') {
               ctx.drawImage(targetEl, 0, 0, canvas.width, canvas.height);
-            } else {
-
             }
           })
                   );
         if (now <= end) {
           requestAnimationFrame(render);
+        } else {
+          recorder.stop();
         }
       }
       startBtn.disabled = false;
       startBtn.onclick = () => {
         start = performance.now();
+        recorder.start();
         requestAnimationFrame(render);
       };
   });
