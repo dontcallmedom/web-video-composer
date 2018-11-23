@@ -10,7 +10,8 @@ function runningTitle(filename, cv) {
   const strokeColor = 'black';
   const highlightColor = '#CB6628';
 
-  const removeSpecialChar = x => x !== '*';
+  const removeSpecialChar = s => s.replace(/\*/g, '')
+        .replace(/\{[^\}]*\}/g, '\u25A0');
 
   let text, start;
   cv.currentTime = 0;
@@ -22,7 +23,7 @@ function runningTitle(filename, cv) {
     fetch(filename).then(r => r.text())
       .then(loadedtext => {
         text = loadedtext;
-        cv.duration = (text.split("\n").length * lineDelay + text.split("\n").reduce((total, l) => total + [...l].filter(removeSpecialChar).length * charDelay, 0) + endDelay) / 1000;
+        cv.duration = (text.split("\n").length * lineDelay + text.split("\n").reduce((total, l) => total + [...removeSpecialChar(l)].length * charDelay, 0) + endDelay) / 1000;
       }),
     new Promise((res) => sound.onloadeddata = res)
   ]
@@ -34,22 +35,45 @@ function runningTitle(filename, cv) {
       s.play();
     }
     const rawchars = [...line];
-    const chars = rawchars.filter(removeSpecialChar);
+    const chars = [...removeSpecialChar(line)];
     ctx.fillText(chars.slice(0, i + 1).join('') +  (withCaret ? '_' : ''), 50, y);
     ctx.strokeText(chars.slice(0, i + 1).join(''), 50, y);
 
     // write highlights
     const tmp = ctx.fillStyle;
     ctx.fillStyle = highlightColor;
-    let rawCur = 0, cur = 0;
+    let rawCur = 0, cur = 0, imageName = '', inImage = false;
     while (cur <= i && rawCur < rawchars.length) {
-      if (rawchars[rawCur] == '*') {
-        const {width: offset} = ctx.measureText(chars.slice(0,cur).join(''));
-        rawCur++;
-        ctx.fillText(chars[cur], 50 + offset, y);
+      if (!inImage) {
+        if (rawchars[rawCur] == '*') {
+          const {width: offset} = ctx.measureText(chars.slice(0,cur).join(''));
+          rawCur++;
+          ctx.fillText(chars[cur], 50 + offset, y);
+        } else if (rawchars[rawCur] == '{') {
+          inImage = true;
+          rawCur++;
+        } else {
+          rawCur++;
+          cur++;
+        }
       } else {
-        cur++;
-        rawCur++;
+        if (rawchars[rawCur] == '}') {
+          const {width: offset} = ctx.measureText(chars.slice(0,cur).join(''));
+          const image = new Image();
+          const {width} = ctx.measureText('\u25A0');
+          const draw = () => {
+            const height = image.naturalHeight * width / image.naturalWidth;
+            ctx.drawImage(image, 50 + offset, y - height*5/6, width, height);
+          }
+          image.onloaddeddata = draw;
+          image.src = imageName;
+          if (image.complete) draw();
+          inImage = false;
+          cur++;
+        } else {
+          imageName += rawchars[rawCur];
+        }
+        rawCur++
       }
     }
     ctx.fillStyle = tmp;
@@ -76,7 +100,7 @@ function runningTitle(filename, cv) {
         ctx.clearRect(0, 0, cv.width, cv.height);
       }, 1000);
     const y = 200 + j*150;
-    const linelength = [...lines[j]].filter(removeSpecialChar).length;
+    const linelength = [...removeSpecialChar(lines[j])].length;
     if (i >= linelength) {
       return setTimeout(() => {
         clearRect(50, 200 + j*150 - fontSize, cv.width - 50, fontSize*1.5);
