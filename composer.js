@@ -1,7 +1,7 @@
 const canvas = document.getElementById('composer');
 const ctx = canvas.getContext('2d');
 const startBtn = document.getElementById('start');
-
+/*
 const videoStream = canvas.captureStream();
 const stream = new MediaStream([...videoStream.getVideoTracks()]);
 
@@ -20,7 +20,7 @@ recorder.onstop = () => {
   link.textContent = "video";
   document.querySelector('body').appendChild(link);
 };
-
+*/
 
 const loadAsset = (type, path) => {
   let el, loaded;
@@ -141,14 +141,16 @@ fetch("script").then(r => r.text())
         if (now <= end) {
           requestAnimationFrame(render);
         } else {
-          recorder.stop();
+          //recorder.stop();
         }
       }
       startBtn.disabled = false;
-      startBtn.onclick = () => {
+      const run = () => {
         start = performance.now();
-        recorder.start();
+        //recorder.start();
         requestAnimationFrame(render);
       };
+      startBtn.onclick = run;
+      document.addEventListener("keypress", run);
   });
   });
