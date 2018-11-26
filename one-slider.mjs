@@ -1,4 +1,4 @@
-function runningTitle(filename, cv) {
+export function runningTitle(filename, cv) {
   const ctx = cv.getContext("2d");
   const charDelay = 50;
   const lineDelay = 50;
@@ -124,4 +124,4 @@ function runningTitle(filename, cv) {
     drawLines(lines, 0, 0);
   }
   return loaded;
-}
+};

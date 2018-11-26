@@ -1,4 +1,4 @@
-function fader(duration, direction='out', cv) {
+export function fader(duration, direction='out', cv) {
   const ctx = cv.getContext("2d");
   cv.duration = duration;
   cv.currentTime = 0;
@@ -22,4 +22,4 @@ function fader(duration, direction='out', cv) {
   };
 
   return new Promise((res, rej) => res());
-}
+};
