@@ -18,7 +18,7 @@ function runningTitle(filename, cv) {
   cv.videoWidth = cv.width;
   cv.videoHeight = cv.height;
   const sound = new Audio('key.mp3');
-  
+
   const loaded = Promise.all([
     fetch(filename).then(r => r.text())
       .then(loadedtext => {
@@ -32,6 +32,7 @@ function runningTitle(filename, cv) {
   function drawLineUpTo(line, i, withCaret, y) {
     if (withCaret) {
       const s = sound.cloneNode(true);
+      s.volume = 0.4;
       s.play();
     }
     const rawchars = [...line];
@@ -98,7 +99,7 @@ function runningTitle(filename, cv) {
       return setTimeout(() => {
         cv.currentTime = performance.now() - start;
         ctx.clearRect(0, 0, cv.width, cv.height);
-      }, 1000);
+      }, endDelay);
     const y = 200 + j*150;
     const linelength = [...removeSpecialChar(lines[j])].length;
     if (i >= linelength) {
