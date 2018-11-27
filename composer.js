@@ -1,4 +1,5 @@
 import {parseTimeline} from './parse-timeline.mjs';
+import {adjustVTT} from './adjust-vtt.mjs';
 
 const canvas = document.getElementById('composer');
 const ctx = canvas.getContext('2d');
@@ -29,6 +30,15 @@ recorder.onstop = () => {
 fetch("script").then(r => r.text())
   .then(text => parseTimeline(text, canvas.width, canvas.height))
   .then(({timeline, assets}) => {
+    const vttByKind = adjustVTT({timeline, assets});
+    Object.keys(vttByKind).forEach(k => {
+      const vtt = vttByKind[k];
+      const link = document.createElement('a');
+      link.setAttribute('download', k + '.webvtt');
+      link.href = "data: text/webvtt," + encodeURIComponent(vtt);
+      link.textContent = "merged " + k;
+      document.querySelector('body').appendChild(link);
+    });
     let start;
     const end = Math.max.apply(null, timeline.map(t => t.end));
     const render = () => {

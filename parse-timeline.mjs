@@ -35,6 +35,25 @@ const loadAsset = (type, path, width, height) => {
   return {el, loaded};
 };
 
+const loadTimeTracks = (el, options) => {
+  // options are like
+  // captions=foo.webvtt descriptions=bar.webvtt
+  const tracks = options.split(' ')
+        .reduce((acc, def) => {
+          const [kind, filename] = def.split('=');
+          acc.push({kind, src: filename});
+          return acc;
+        }, []);
+  el._textTracks = [];
+  return Promise.all(
+    tracks.map(t =>
+               fetch(t.src)
+               .then(r => r.text())
+               .then(text => t.text = text)
+               .then(() => el._textTracks.push(t))
+              ));
+};
+
 export function parseTimeline(text, width, height) {
   const [assetDefs, ...timelineDefs] = text.split("\n\n");
   const allLoaded = [];
@@ -43,6 +62,9 @@ export function parseTimeline(text, width, height) {
     const [filename, fileoptions] = filedesc.split(' ');
     const {el, loaded} = loadAsset(id.slice(0, 1), filename, width, height);
     allLoaded.push(loaded);
+    if (fileoptions) {
+      allLoaded.concat(loadTimeTracks(el, fileoptions));
+    }
     acc[id] = {filename, el};
     return acc;
   }, {});

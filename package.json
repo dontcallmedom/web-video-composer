@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "webvtt-parser": "git+ssh://git@github.com/annevk/webvtt.git"
+  }
+}
