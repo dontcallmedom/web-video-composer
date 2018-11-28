@@ -27,8 +27,8 @@ const setLoadState = ev => {
   }
 };
 
-urlInput.addEventListener("oninput", setLoadState);
-fileInput.addEventListener("onchange", setLoadState);
+urlInput.addEventListener("input", setLoadState);
+fileInput.addEventListener("change", setLoadState);
 loadBtn.addEventListener("click", start);
 
 if (location.search) {
