@@ -1,0 +1,61 @@
+v1:https://media.w3.org/2018/10/w3c-particles.webm
+v2:https://media.w3.org/2018/10/TPAC/W3C_Watson_communities.mp4 captions=https://media.w3.org/2018/10/TPAC/W3C_Watson_communities.webvtt
+v3:https://media.w3.org/2018/10/TPAC/tpac-gathering.webm
+t1:example/watson-intro.txt
+t2:example/cg-intro.txt
+t3:example/tpac-intro.txt
+t4:example/pwe-intro.txt
+i1:example/w3c-closing.png
+
+00:00:00,000->>v1
+play v1
+
+-00:00:02,000->>v1
+play v1 fadeout
+play v2 fadein
+
++00:00:00,000->+00:00:01,400
+play v2
+
++00:00:00,000->+t1
+pause v2
+play t1
+
++00:00:00,000->+00:00:11,700
+play v2
+
++00:00:00,000->+t2
+pause v2
+play t2
+
++00:00:00,000->+00:00:30,500
+play v2
+
++00:00:00,000->+t3
+pause v2
+play t3
+
++00:00:00,000->>v3
+pause v2
+play v3
+
++00:00:00,000->+00:00:02,000
+pause v3 fadeout
+play v2 fadein
+
++00:00:00,000->+00:01:19,300
+play v2
+
++00:00:00,000->+t4
+pause v2
+play t4
+
++00:00:00,000->>v2
+play v2
+
++00:00:00,000->>+00:00:02,000
+pause v2 fadeout
+play i1 fadein
+
++00:00:00,000->+00:00:03,000
+play i1

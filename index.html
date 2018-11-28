@@ -11,8 +11,14 @@
     body { overflow: hidden;}
   </style>
   <body>
-    <canvas width="1280" height=720 id="composer"></canvas>
-    <button id=start disabled>Start</button>
+    <div id=loader>
+      <label>Declarative timeline: <input type=url id=url> <input id=file type=file></label>
+      <button disabled id=load>Load</button>
+    </div>
+    <div id=renderer>
+      <canvas width="1280" height=720 id="composer"></canvas>
+      <button id=start disabled>Start</button>
+    </div>
     <script src="node_modules/webvtt-parser/parser.js">
     </script>
     <script src="composer.js" type=module></script>

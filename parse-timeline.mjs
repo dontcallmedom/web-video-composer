@@ -58,7 +58,7 @@ export function parseTimeline(text, width, height) {
   const [assetDefs, ...timelineDefs] = text.split("\n\n");
   const allLoaded = [];
   const assets = assetDefs.split('\n').reduce((acc, def) => {
-    const [id, filedesc] = def.split(':');
+    const [, id, filedesc] = def.match(/^([^:]*):(.*)$/);
     const [filename, fileoptions] = filedesc.split(' ');
     const {el, loaded} = loadAsset(id.slice(0, 1), filename, width, height);
     allLoaded.push(loaded);

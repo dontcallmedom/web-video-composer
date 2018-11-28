@@ -17,7 +17,7 @@ export function runningTitle(filename, cv) {
   cv.currentTime = 0;
   cv.videoWidth = cv.width;
   cv.videoHeight = cv.height;
-  const sound = new Audio('key.mp3');
+  const sound = new Audio('example/key.mp3');
 
   const loaded = Promise.all([
     fetch(filename).then(r => r.text())
