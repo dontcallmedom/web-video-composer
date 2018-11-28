@@ -9,7 +9,6 @@ const startBtn = document.getElementById('start');
 const urlInput = document.getElementById('url');
 const fileInput = document.getElementById('file');
 
-if (urlInput.value || fileInput.files.length) loadBtn.disabled = false;
 
 const setLoadState = ev => {
   console.log(ev);
@@ -28,13 +27,16 @@ const setLoadState = ev => {
   }
 };
 
-urlInput.addEventListener("onchange", setLoadState);
+urlInput.addEventListener("oninput", setLoadState);
 fileInput.addEventListener("onchange", setLoadState);
 loadBtn.addEventListener("click", start);
 
 if (location.search) {
   urlInput.value = location.search.slice(1);
 }
+
+if (urlInput.value || fileInput.files.length) loadBtn.disabled = false;
+
 
 /*
 const videoStream = canvas.captureStream();
